@@ -11,9 +11,11 @@ jobs:
 
       ### Gradle ###
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+        run: chmod +x ./gradlew
+        shell: bash
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew clean build
+        shell: bash
 
       ### Docker ###
       - name: Docker build
