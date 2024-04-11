@@ -52,7 +52,7 @@ tasks.named('test') {
 
 subprojects {
 	bootJar {
-		from('./.ebextensions') {
+		from('./.ebextensions') {  // 아마도 이건 의미가 없는듯하다(?)
 			into '.ebextensions'
 		}
 	}
