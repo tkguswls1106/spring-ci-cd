@@ -7,18 +7,14 @@ on:
 jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
-    container: amazonlinux:2
-    steps:
 
-      ### Setup ###
-      - name: Checkout code
+    steps:
+      - name: Checkout
         uses: actions/checkout@v2
 
       ### Gradle ###
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Install Java (Amazon Linux 2)
-        run: yum install -y java-1.8.0-openjdk-devel
       - name: Build with Gradle
         run: ./gradlew build
 
