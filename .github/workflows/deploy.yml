@@ -56,3 +56,4 @@ jobs:
           version_label: "github-action--${{ steps.format-time.outputs.replaced }}"
           region: ap-northeast-2
           deployment_package: Dockerrun.aws.json
+          wait_for_environment_recovery: 300
