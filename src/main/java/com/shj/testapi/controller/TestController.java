@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @GetMapping("/test")
-    public TestResponseDto signup() {
+    public TestResponseDto test() {
         TestResponseDto testResponseDto = new TestResponseDto("Success - Test Success!");
         System.out.println("Test api");
         return testResponseDto;
