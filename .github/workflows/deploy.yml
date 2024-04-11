@@ -45,6 +45,14 @@ jobs:
           replace-with: '-'
           flags: 'g'
 
+      ### Zip file ###
+      - name: Generate deployment package
+        run: |
+          mkdir -p deploy
+          cp -r .ebextensions deploy/.ebextensions
+          cp Dockerrun.aws.json deploy/Dockerrun.aws.json
+          cd deploy && zip -r deploy.zip .
+
       ### AWS Elastic Beanstalk ###
       - name: Beanstalk Deploy
         uses: einaregilsson/beanstalk-deploy@v20
@@ -55,5 +63,5 @@ jobs:
           environment_name: Test-env
           version_label: "github-action--${{ steps.format-time.outputs.replaced }}"
           region: ap-northeast-2
-          deployment_package: Dockerrun.aws.json
+          deployment_package: deploy/deploy.zip
           wait_for_environment_recovery: 300
