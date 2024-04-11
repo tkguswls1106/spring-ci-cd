@@ -14,6 +14,7 @@ public class TestController {
     @GetMapping("/test")
     public TestResponseDto signup() {
         TestResponseDto testResponseDto = new TestResponseDto("Success - Test Success!");
+        System.out.println("Test api");
         return testResponseDto;
     }
 }
