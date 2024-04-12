@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-    deploy:
+    test-and-deploy:
     runs-on: ubuntu-latest
     steps:
 
@@ -59,4 +59,4 @@ jobs:
           version_label: "github-action--${{ steps.current-ksttime.outputs.formattedTime }}"
           region: ap-northeast-2
           deployment_package: deploy/deploy.zip
-          wait_for_environment_recovery: 300
+          wait_for_deployment: false
