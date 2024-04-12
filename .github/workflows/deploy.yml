@@ -5,10 +5,11 @@ on:
     branches: [ master ]
 
 jobs:
-  job1:
+  test-and-deploy:
     runs-on: ubuntu-latest
     steps:
 
+      ### Set Up ###
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up JDK 17
@@ -46,12 +47,6 @@ jobs:
           cp -r .ebextensions deploy/.ebextensions
           cp Dockerrun.aws.json deploy/Dockerrun.aws.json
           cd deploy && zip -r deploy.zip .
-
-  job2:
-    runs-on: ubuntu-latest
-    needs: job1  # Specifies that job2 depends on job1
-    continue-on-error: true  # Elastic Beanstalk - No Data Timeout Error Ignore
-    steps:
 
       ### AWS Elastic Beanstalk ###
       - name: Beanstalk Deploy
