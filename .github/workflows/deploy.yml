@@ -40,7 +40,7 @@ jobs:
           format: YYYY-MM-DDTHH:mm:ss
           utcOffset: "+09:00"  # KST time = UTC time + 9hour
 
-      ### Zip file ###
+      ### ZIP file ###
       - name: Generate deployment package
         run: |
           mkdir -p deploy
