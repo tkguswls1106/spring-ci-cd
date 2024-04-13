@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +35,17 @@ public class RabbitConfig {
     private int rabbitPort;
     private String rabbitVirtualHost = "/";
 
+
+    // RabbitAdmin을 사용하면 RabbitMQ 서버에 Exchange, Queue, Binding을 등록할 수 있다.
+    // 이는 RabbitTemplate을 사용하여 RabbitMQ 서버에 접근한다.
+    @Bean
+    public AmqpAdmin amqpAdmin() {
+        RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory());
+        rabbitAdmin.declareExchange(exchange());
+        rabbitAdmin.declareQueue(queue());
+        rabbitAdmin.declareBinding(binding(queue(), exchange()));
+        return rabbitAdmin;
+    }
 
     // Queue 등록
     @Bean
