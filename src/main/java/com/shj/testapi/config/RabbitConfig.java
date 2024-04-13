@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -17,12 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@RequiredArgsConstructor
 @Configuration
 @EnableRabbit
 public class RabbitConfig {
-
-    private final AmqpAdmin amqpAdmin;
 
     private static final String CHAT_QUEUE_NAME = "chat.queue";
     private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
@@ -50,10 +48,6 @@ public class RabbitConfig {
     @Bean
     public TopicExchange exchange() {
         return new TopicExchange(CHAT_EXCHANGE_NAME,true,false);
-    }
-    @PostConstruct
-    public void createExchange() {
-        amqpAdmin.declareExchange(exchange());
     }
 
     // Exchange와 Queue 바인딩
