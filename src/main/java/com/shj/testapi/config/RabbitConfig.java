@@ -20,9 +20,15 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitConfig {
 
-    private static final String CHAT_QUEUE_NAME = "chat.queue";
-    private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
-    private static final String ROUTING_KEY = "room.*";  // 참고: 'https://zamezzz.tistory.com/326'
+    // exchange와 queue는 1:n 관계로 해석해도 괜찮을듯 하다.
+    // queue는 exchange와 바인딩되어 한세트로 묶여있음.
+    public static final String CHAT_QUEUE_NAME = "chat.queue";
+    public static final String CHAT_EXCHANGE_NAME = "chat.exchange";
+    public static final String CHAT_ROUTING_KEY = "room.*";  // 참고: 'https://zamezzz.tistory.com/326'
+
+    public static final String OTHER_QUEUE_NAME = "other.queue";
+    public static final String OTHER_EXCHANGE_NAME = "other.exchange";
+    public static final String OTHER_ROUTING_KEY = "other.*";
 
     // 주의할점은, 여기의 @Value는 'springframework.beans.factory.annotation.Value'소속이다! lombok의 @Value와 착각하지 말자!
     @Value("${spring.rabbitmq.username}")
@@ -41,31 +47,53 @@ public class RabbitConfig {
     @Bean
     public AmqpAdmin amqpAdmin() {
         RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory());
-        rabbitAdmin.declareExchange(exchange());
-        rabbitAdmin.declareQueue(queue());
-        rabbitAdmin.declareBinding(binding(queue(), exchange()));
+
+        rabbitAdmin.declareExchange(chatExchange());
+        rabbitAdmin.declareExchange(otherExchange());
+
+        rabbitAdmin.declareQueue(chatQueue());
+        rabbitAdmin.declareQueue(otherQueue());
+
+        rabbitAdmin.declareBinding(chatBinding(chatQueue(), chatExchange()));
+        rabbitAdmin.declareBinding(otherBinding(otherQueue(), otherExchange()));
+
         return rabbitAdmin;
     }
 
     // Queue 등록
     @Bean
-    public Queue queue() {
+    public Queue chatQueue() {
         return new Queue(CHAT_QUEUE_NAME, true);
+    }
+    @Bean
+    public Queue otherQueue() {
+        return new Queue(OTHER_QUEUE_NAME, true);
     }
 
     // Exchange 등록
     @Bean
-    public TopicExchange exchange() {
+    public TopicExchange chatExchange() {
         return new TopicExchange(CHAT_EXCHANGE_NAME,true,false);
+    }
+    @Bean
+    public TopicExchange otherExchange() {
+        return new TopicExchange(OTHER_EXCHANGE_NAME,true,false);
     }
 
     // Exchange와 Queue 바인딩
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {  // 메시지가 소비자(Consumer)가 없는 경우에도 메시지를 보존할 수 있어 중요한 메시지의 유실을 방지할 수 있음.
+    public Binding chatBinding(Queue queue, TopicExchange exchange) {  // 메시지가 소비자(Consumer)가 없는 경우에도 메시지를 보존할 수 있어 중요한 메시지의 유실을 방지할 수 있음.
         return BindingBuilder
                 .bind(queue)
                 .to(exchange)
-                .with(ROUTING_KEY);
+                .with(CHAT_ROUTING_KEY);
+    }
+    @Bean
+    public Binding otherBinding(Queue queue, TopicExchange exchange) {  // 메시지가 소비자(Consumer)가 없는 경우에도 메시지를 보존할 수 있어 중요한 메시지의 유실을 방지할 수 있음.
+        return BindingBuilder
+                .bind(queue)
+                .to(exchange)
+                .with(OTHER_ROUTING_KEY);
     }
 
     @Bean
@@ -82,7 +110,6 @@ public class RabbitConfig {
     public RabbitTemplate rabbitTemplate(){
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
-        rabbitTemplate.setRoutingKey(CHAT_QUEUE_NAME);  // 이건 안적어도 되지않나 싶다(?)
         return rabbitTemplate;
     }
     // RabbitMQ와의 연결을 관리하는 클래스
